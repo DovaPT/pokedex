@@ -1,0 +1,22 @@
+[
+  {
+    "id": 0,
+    "name": "Bulbasaur",
+    "typing": ["Grass", "Poison"]
+  },
+  {
+    "id": 1,
+    "name": "Ivysaur",
+    "typing": ["Grass", "Poison"]
+  },
+  {
+    "id": 4,
+    "name": "Charmander",
+    "typing": "Fire"
+  },
+  {
+    "id": 10,
+    "name": "Caterpie",
+    "typing": "Bug"
+  }
+]
