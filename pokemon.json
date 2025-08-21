@@ -2,21 +2,121 @@
   {
     "id": 0,
     "name": "Bulbasaur",
-    "typing": ["Grass", "Poison"]
+    "typing": [
+      "Grass",
+      "Poison"
+    ]
   },
   {
     "id": 1,
     "name": "Ivysaur",
-    "typing": ["Grass", "Poison"]
+    "typing": [
+      "Grass",
+      "Poison"
+    ]
   },
   {
     "id": 4,
     "name": "Charmander",
-    "typing": "Fire"
+    "typing": [
+      "Fire"
+    ]
   },
   {
     "id": 10,
     "name": "Caterpie",
-    "typing": "Bug"
+    "typing": [
+      "Bug"
+    ]
+  },
+  {
+    "id": 13,
+    "name": "Pigey",
+    "typing": [
+      "Normal",
+      "Flying"
+    ]
+  },
+  {
+    "id": 25,
+    "name": "Pikachu",
+    "typing": [
+      "Electric"
+    ]
+  },
+  {
+    "id": 35,
+    "name": "Clefairy",
+    "typing": [
+      "Fairy"
+    ]
+  },
+  {
+    "id": 54,
+    "name": "Psyduck",
+    "typing": [
+      "Water"
+    ]
+  },
+  {
+    "id": 56,
+    "name": "Mankey",
+    "typing": [
+      "Fighting"
+    ]
+  },
+  {
+    "id": 63,
+    "name": "Abra",
+    "typing": [
+      "Psychic"
+    ]
+  },
+  {
+    "id": 74,
+    "name": "Geodude",
+    "typing": [
+      "Rock",
+      "Ground"
+    ]
+  },
+  {
+    "id": 81,
+    "name": "Magnemite",
+    "typing": [
+      "Electric",
+      "Steel"
+    ]
+  },
+  {
+    "id": 91,
+    "name": "Cloyster",
+    "typing": [
+      "Water",
+      "Ice"
+    ]
+  },
+  {
+    "id": 92,
+    "name": "Ghastly",
+    "typing": [
+      "Ghost",
+      "Poison"
+    ]
+  },
+  {
+    "id": 197,
+    "name": "Umbreon",
+    "typing": [
+      "Dark"
+    ]
+  },
+  {
+    "id": 149,
+    "name": "Dragonite",
+    "typing": [
+      "Dragon",
+      "Flying"
+    ]
   }
 ]
