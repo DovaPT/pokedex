@@ -95,21 +95,29 @@ impl Display for Typing {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Single(t) => write!(f, "{}", t[0]),
-            Self::Double(t) => write!(f, "{}, {}", t[0], t[1]),
+            Self::Double(t) => write!(f, "{} {}", t[0], t[1]),
         }
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct Pokemon {
     id: u32,
     name: String,
     typing: Typing,
 }
 
+impl Debug for Pokemon {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Id: {}\nName: {}\nTyping: {}", self.id, self.name, self.typing)
+    }
+}
+
 fn main() -> Result<()> {
     let json = read_to_string("pokemon.json").expect("could not read file");
     let mons: Vec<Pokemon> = serde_json::from_str(&json)?;
-    println!("{:#?}", mons);
+    for p in mons{
+        println!("{p:#?}\n");
+    }
     Ok(())
 }
