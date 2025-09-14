@@ -1,5 +1,5 @@
 use std::{
-    fmt::{self, Debug, Display},
+    fmt::{self, Debug, Display}, str
 };
 
 use serde::{Deserialize, Serialize};
@@ -9,6 +9,38 @@ struct Color {
     r: u8,
     g: u8,
     b: u8,
+}
+
+#[derive(Debug)]
+struct ParseColorError;
+
+impl str::FromStr for Color {
+    type Err = ParseColorError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (r, g, b) = s
+            .strip_prefix('#')
+            .and_then(|s| match s.len() {
+                3 => Some((&s[0..1], &s[1..2], &s[2..3])),
+                6 => Some((&s[0..2], &s[2..4], &s[4..6])),
+                _ => None,
+            })
+            .ok_or(ParseColorError)?;
+        let mut r_fromstr = u8::from_str_radix(r, 16).map_err(|_| ParseColorError)?;
+        let mut g_fromstr = u8::from_str_radix(g, 16).map_err(|_| ParseColorError)?;
+        let mut b_fromstr = u8::from_str_radix(b, 16).map_err(|_| ParseColorError)?;
+
+        if r.len() < 2 {
+            r_fromstr *= 16;
+            g_fromstr *= 16;
+            b_fromstr *= 16;
+        }
+        Ok(Color {
+            r: r_fromstr,
+            g: g_fromstr,
+            b: b_fromstr,
+        })
+    }
 }
 
 impl Display for Color {
@@ -54,19 +86,21 @@ impl TermColor {
         res
     }
 
-    fn with_bg(&mut self, color: &Color) -> &mut Self {
-        self.bg = Some(*color);
+    fn with_bg(&mut self, color: Color) -> &mut Self {
+        self.bg = Some(color);
         self
     }
 
-    fn with_fg(&mut self, color: &Color) -> &mut Self {
-        self.fg = Some(*color);
+    fn with_fg(&mut self, color: Color) -> &mut Self {
+        self.fg = Some(color);
 
         self
     }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = "name")]
+#[serde(rename_all = "lowercase")]
 enum Type {
     Fire,
     Grass,
@@ -90,252 +124,158 @@ enum Type {
 
 impl Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut color = TermColor::new(
-            None,
-            Some(Color {
-                r: 240,
-                g: 240,
-                b: 240,
-            }),
-        );
-        match self {
-            Self::Fire => write!(
+        let mut term_color = TermColor::new(None, Some("#FFF".parse().expect("Failed to parse Color")));
+
+        use Type::*;
+        match *self {
+            Fire => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color {
-                        r: 255,
-                        g: 129,
-                        b: 48
-                    })
+                term_color
+                    .with_bg("#FF8030".parse().expect("Failed to parse Color"))
                     .paint(" Fire ")
             ),
-            Self::Grass => write!(
+            Grass => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color {
-                        r: 112,
-                        g: 192,
-                        b: 80
-                    })
+                term_color
+                    .with_bg("#70C050".parse().expect("Failed to parse Color"))
                     .paint(" Grass ")
             ),
-            Self::Water => write!(
+            Water => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color {
-                        r: 48,
-                        g: 144,
-                        b: 240
-                    })
+                term_color
+                    .with_bg("#3090F0".parse().expect("Failed to parse Color"))
                     .paint(" Water ")
             ),
-            Self::Poison => write!(
+            Poison => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color {
-                        r: 160,
-                        g: 80,
-                        b: 144
-                    })
+                term_color
+                    .with_bg("#A05090".parse().expect("Failed to parse Color"))
                     .paint(" Poison ")
             ),
-            Self::Bug => write!(
+            Bug => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color {
-                        r: 160,
-                        g: 176,
-                        b: 32
-                    })
+                term_color
+                    .with_bg("#A0B020".parse().expect("Failed to parse Color"))
                     .paint(" Bug ")
             ),
-            Self::Normal => write!(
+            Normal => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color {
-                        r: 160,
-                        g: 160,
-                        b: 144
-                    })
+                term_color
+                    .with_bg("#A0A090".parse().expect("Failed to parse Color"))
                     .paint(" Normal ")
             ),
-            Self::Flying => write!(
+            Flying => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 128,
-                        g: 144,
-                        b: 240
-                    })
+                term_color
+                    .with_bg("#8090F0".parse().expect("Failed to parse Color"))
                     .paint(" Flying ")
             ),
-            Self::Dark => write!(
+            Dark => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 112,
-                        g: 80,
-                        b: 64
-                    })
+                term_color
+                    .with_bg("#705040".parse().expect("Failed to parse Color"))
                     .paint(" Dark ")
             ),
-            Self::Dragon => write!(
+            Dragon => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 112,
-                        g: 96,
-                        b: 224
-                    })
+                term_color
+                    .with_bg("#7060E0".parse().expect("Failed to parse Color"))
                     .paint(" Dragon ")
             ),
-            Self::Rock => write!(
+            Rock => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 176,
-                        g: 160,
-                        b: 96
-                    })
+                term_color
+                    .with_bg("#B0A060".parse().expect("Failed to parse Color"))
                     .paint(" Rock ")
             ),
-            Self::Ground => write!(
+            Ground => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 208,
-                        g: 176,
-                        b: 80
-                    })
+                term_color
+                    .with_bg("#D0B050".parse().expect("Failed to parse Color"))
                     .paint(" Ground ")
             ),
-            Self::Ice => write!(
+            Ice => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 96,
-                        g: 192,
-                        b: 240
-                    })
+                term_color
+                    .with_bg("#60C0F0".parse().expect("Failed to parse Color"))
                     .paint(" Ice ")
             ),
-            Self::Psychic => write!(
+            Psychic => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 240,
-                        g: 80,
-                        b: 144
-                    })
+                term_color
+                    .with_bg("#F05090".parse().expect("Failed to parse Color"))
                     .paint(" Psychic ")
             ),
-            Self::Fairy => write!(
+            Fairy => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 224,
-                        g: 144,
-                        b: 224
-                    })
+                term_color
+                    .with_bg("#E090E0".parse().expect("Failed to parse Color"))
                     .paint(" Fairy ")
             ),
-            Self::Ghost => write!(
+            Ghost => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 96,
-                        g: 96,
-                        b: 176
-                    })
+                term_color
+                    .with_bg("#6060B0".parse().expect("Failed to parse Color"))
                     .paint(" Ghost ")
             ),
-            Self::Fighting => write!(
+            Fighting => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 176,
-                        g: 80,
-                        b: 64
-                    })
+                term_color
+                    .with_bg("#B05040".parse().expect("Failed to parse Color"))
                     .paint(" Fighting ")
             ),
-            Self::Electric => write!(
+            Electric => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 240,
-                        g: 192,
-                        b: 48
-                    })
+                term_color
+                    .with_bg("#F0C030".parse().expect("Failed to parse Color"))
                     .paint(" Electric ")
             ),
-            Self::Steel => write!(
+            Steel => write!(
                 f,
                 "{}",
-                color
-                    .with_bg(&Color { 
-                        r: 160,
-                        g: 160,
-                        b: 176
-                    })
+                term_color
+                    .with_bg("#A0A0B0".parse().expect("Failed to parse Color"))
                     .paint(" Steel ")
             ),
         }
     }
 }
 
-#[derive(Serialize, Deserialize)]
-#[serde(untagged)]
-enum Typing {
-    Single([Type; 1]),
-    Double([Type; 2]),
-}
-
-impl Debug for Typing {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self)
-    }
-}
-
-impl Display for Typing {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Single([t]) => write!(f, "{}", t),
-            Self::Double([t1, t2]) => write!(f, "{} {}", t1, t2),
-        }
-    }
+#[derive(Debug, Serialize, Deserialize)]
+struct Types {
+    r#type: Type
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Pokemon {
     id: u32,
     name: String,
-    typing: Typing,
+    types: Vec<Types>,
 }
 
 impl Debug for Pokemon {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Id: {}\nName: {}\nTyping: {}",
-            self.id, self.name, self.typing
+            "Id: {}\nName: {}\nTyping: {} {}",
+            self.id, self.name, self.types[0].r#type, self.types.get(1).map_or_else(|| " ".to_string(), |t| t.r#type.to_string())
         )
     }
 }

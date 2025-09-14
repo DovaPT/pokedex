@@ -1,12 +1,11 @@
-use std::fs::read_to_string;
-use pokedex::Pokemon;
-use serde_json::Result;
+use std::error::Error;
 
-fn main() -> Result<()> {
-    let json = read_to_string("pokemon.json").expect("could not read file");
-    let mons: Vec<Pokemon> = serde_json::from_str(&json)?;
-    for p in mons {
-        println!("{p:#?}\n");
-    }
+use pokedex::Pokemon;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
+    let json = reqwest::get("https://pokeapi.co/api/v2/pokemon/5").await?.text().await?;
+    let mon: Pokemon = serde_json::from_str(&json)?;
+    println!("{:?}", mon);
     Ok(())
 }
